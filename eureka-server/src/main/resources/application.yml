@@ -1,0 +1,13 @@
+server:
+  port: 7002
+
+eureka:
+  instance:
+    hostname: EUREKA02
+  client:
+#    是否要自己注册到EUREKA 上
+    register-with-eureka: false
+#    不需要去服务注册中心获取其他服务地址
+    fetch-registry: false
+    service-url:
+      defaultZone:  http://EUREKA01:7001/eureka/

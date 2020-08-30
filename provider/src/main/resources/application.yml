@@ -1,0 +1,15 @@
+server:
+  port: 8001
+
+spring:
+  application:
+    name: provider
+
+eureka:
+  client:
+    #    是否要自己注册到EUREKA 上
+    register-with-eureka: true
+    #    不需要去服务注册中心获取其他服务地址
+    fetch-registry: true
+    service-url:
+      defaultZone:  http://EUREKA01:7001/eureka/,http://EUREKA02:7002/eureka/

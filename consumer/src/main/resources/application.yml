@@ -1,0 +1,15 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: consumer
+
+eureka:
+  client:
+    #    是否要自己注册到EUREKA 上
+    register-with-eureka: false
+    #    需要去服务注册中心获取其他服务地址,true才可以通过名称调用其他服务
+    fetch-registry: true
+    service-url:
+      defaultZone:  http://EUREKA01:7001/eureka/,http://EUREKA02:7002/eureka/
