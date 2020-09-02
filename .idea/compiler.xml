@@ -10,11 +10,11 @@
         <module name="eurekaserver" />
         <module name="eureka-server" />
         <module name="provider" />
+        <module name="provider02" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="8">
       <module name="eurekaserverback" target="1.5" />
-      <module name="provider02" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

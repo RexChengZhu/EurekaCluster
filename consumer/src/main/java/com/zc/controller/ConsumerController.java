@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 public class ConsumerController implements ApplicationContextAware {
@@ -21,19 +23,16 @@ public class ConsumerController implements ApplicationContextAware {
 
     @GetMapping("/test")
     public String test(){
-
-
-        for (int i = 0; i < 100; i++) {
-            new Thread(()->{
+        ExecutorService pool = Executors.newCachedThreadPool();
+        for (int i = 0; i < 400 ; i++) {
+            pool.execute(()->{
                 ResponseEntity<String> forEntity = restTemplate.getForEntity("http://PROVIDER/test", String.class);
                 String body = forEntity.getBody();
 
                 System.out.println(body);
-            }).start();
-
+            });
         }
         return "ok";
-
     }
 
 

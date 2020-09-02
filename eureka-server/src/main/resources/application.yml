@@ -1,13 +1,18 @@
 server:
-  port: 7002
+  port: 7001
 
 eureka:
+  server:
+#    关闭保护模式
+    enable-self-preservation: false
   instance:
-    hostname: EUREKA02
+
+    lease-renewal-interval-in-seconds: 1
+    lease-expiration-duration-in-seconds: 2
   client:
 #    是否要自己注册到EUREKA 上
     register-with-eureka: false
 #    不需要去服务注册中心获取其他服务地址
     fetch-registry: false
     service-url:
-      defaultZone:  http://EUREKA01:7001/eureka/
+      defaultZone:  http://EUREKA02:7002/eureka/

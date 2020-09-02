@@ -3,6 +3,7 @@ package com.zc.rule;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.AbstractLoadBalancerRule;
 import com.netflix.loadbalancer.ILoadBalancer;
+import com.netflix.loadbalancer.RandomRule;
 import com.netflix.loadbalancer.Server;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,8 +21,7 @@ import java.util.*;
  */
 public class MyRule extends AbstractLoadBalancerRule{
 
-    private static Map<String,String> ribbonMap = new HashMap<>();
-    private static Map<String,String> originMap = new HashMap<>();
+    private static List<String> arr = new ArrayList<>();
 
     static {
         // 如果想要实现不重启更新配置，可以开启一个定时器刷新更新配置文件
@@ -31,7 +31,11 @@ public class MyRule extends AbstractLoadBalancerRule{
             while (enumeration.hasMoreElements()){
                 String key = (String) enumeration.nextElement();
                 String value = properties.getProperty(key);
-                originMap.put(key,value);
+                // 获得每个服务的占比
+                Integer size = Integer.valueOf(value);
+                for (Integer i = 0; i < size; i++) {
+                    arr.add(key);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -46,30 +50,19 @@ public class MyRule extends AbstractLoadBalancerRule{
 
 
 
+    private static final Random random = new Random();
     @Override
     public Server choose(Object key) {
         // 如果所有服务都用完了则重新拷贝一份
-        Optional<String> isEmpty = ribbonMap.values().stream().filter(data -> !"0".equals(data)).findAny();
-        if (!isEmpty.isPresent()){
-            ribbonMap.putAll(originMap);
-        }
+
         ILoadBalancer loadBalancer = getLoadBalancer();
         List<Server> reachableServers = loadBalancer.getReachableServers();
-        Optional<Server> avaServer = reachableServers.stream().filter(server -> ribbonMap.keySet().contains(server.getHostPort())).findAny();
-        if (avaServer.isPresent()){
-            Server server = avaServer.get();
-            synchronized (server){
-                String value = ribbonMap.get(server.getHostPort());
-                Integer integer = Integer.valueOf(value);
-                integer--;
-                if (integer<=0){
-                    ribbonMap.remove(server.getHostPort());
-                }else{
-                    ribbonMap.put(server.getHostPort(), integer+"");
-                }
-            }
-            return server;
-        }
-        return null;
+        int size = arr.size();
+        int index = random.nextInt(size);
+        String port = arr.get(index);
+        Optional<Server> any = reachableServers.stream().filter(server -> port.equals(server.getHostPort())).findAny();
+        return any.orElse(null);
     }
+
+
 }
